@@ -4,3 +4,4 @@ bcrypt
 markdown
 psycopg2
 pybase64
+pycrypto

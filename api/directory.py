@@ -19,6 +19,7 @@ define("db_database", default="symatec", help="blog database name")
 define("db_user", default="directory", help="blog database user")
 define("db_password", default="directory", help="blog database password")
 
+
 class NoResultError(Exception):
     pass
 
@@ -87,12 +88,14 @@ class BaseHandler(tornado.web.RequestHandler):
     def send_forbidden(self):
         raise tornado.web.HTTPError(403)
 
+
 class AuthenticationHandler(BaseHandler):
     """
     Checks user authentication credentials and returns boolean result.
     True means authorized user
     False means unauthorized user
     """
+
     async def isAuthorized(self, user):
         try:
             auth_header = self.request.headers.get('Authorization')
@@ -112,7 +115,6 @@ class AuthenticationHandler(BaseHandler):
         except NoResultError:
             return False
 
-
     def getUsernameFromAuthHeader(self):
         auth_header = self.request.headers.get('Authorization')
         if auth_header is None or not auth_header.startswith('Basic'):
@@ -122,7 +124,16 @@ class AuthenticationHandler(BaseHandler):
             username, password = auth_decoded.decode('utf-8').split(':', 2)
             return username
 
-    async def userExists(self,username):
+    def getPasswordFromAuthHeader(self):
+        auth_header = self.request.headers.get('Authorization')
+        if auth_header is None or not auth_header.startswith('Basic'):
+            return None
+        else:
+            auth_decoded = base64.b64decode(bytes(auth_header[6:], 'utf-8'))
+            username, password = auth_decoded.decode('utf-8').split(':', 2)
+            return password
+
+    async def userExists(self, username):
         if username:
             try:
                 user = await self.getuserbyname(username)
@@ -137,11 +148,12 @@ class AuthenticationHandler(BaseHandler):
         )
         return tornado.escape.to_unicode(hashed_password)
 
-    async def get_hashed_password(self,newpassword, hashed_password):
+    async def get_hashed_password(self, newpassword, hashed_password):
         new_hashed_password = await tornado.ioloop.IOLoop.current().run_in_executor(
             None, bcrypt.hashpw, tornado.escape.utf8(newpassword),
             tornado.escape.utf8(hashed_password))
         return tornado.escape.to_unicode(new_hashed_password)
+
 
 class EmployeeHandler(AuthenticationHandler):
     async def get(self, userid):
@@ -153,6 +165,7 @@ class EmployeeHandler(AuthenticationHandler):
                     self.send_not_authorized()
                 else:
                     employee = Employee(None, user)
+                    employee.decrypt(self.getPasswordFromAuthHeader())
                     self.write(employee.toJson())
             except NoResultError:
                 raise tornado.web.HTTPError(404)
@@ -167,8 +180,10 @@ class EmployeeHandler(AuthenticationHandler):
                 if authorized is not True:
                     self.send_not_authorized()
                 else:
+                    print(self.request.body)
                     json_data = tornado.escape.json_decode(self.request.body)
                     updated_employee = Employee(json_data)
+                    updated_employee.encrypt(updated_employee.getPassword())
                     updated_employee.set_hashed_password(
                         await self.get_hashed_password(json_data['password'], user.hashed_password))
                     employee = Employee(None, user)
@@ -183,7 +198,7 @@ class EmployeeHandler(AuthenticationHandler):
                         else:
                             updateUser = await self.queryone(
                                 "UPDATE employees SET ( email ,username ,firstname ,lastname ,birthdate ,hashed_password, type, phonenumber) = "
-                                "(%s,%s,%s,%s,  to_date(%s, 'DD-MM-YYY'), %s, %s, %s) where id = %s RETURNING id",
+                                "(%s,%s,%s,%s, %s, %s, %s, %s) where id = %s RETURNING id",
                                 updated_employee.getEmail(),
                                 updated_employee.getUsername(),
                                 updated_employee.getFirstname(),
@@ -214,7 +229,7 @@ class AddEmployeeHandler(AuthenticationHandler):
         else:
             user = await self.getuserbyname(username)
             authorized = await self.isAuthorized(user)
-            authorized_employee = Employee(None,user)
+            authorized_employee = Employee(None, user)
             if authorized is False:
                 self.send_not_authorized()
             json_data = tornado.escape.json_decode(self.request.body)
@@ -228,11 +243,12 @@ class AddEmployeeHandler(AuthenticationHandler):
             if user is not None and user['username'] == employee_to_add.getUsername():
                 raise tornado.web.HTTPError(400, "employee_to_add already exists")
             else:
+                employee_to_add.encrypt(employee_to_add.getPassword())
                 hashed_password = await self.generate_hashed_password(employee_to_add.getPassword())
                 employee_to_add.set_hashed_password(hashed_password)
             newUser = await self.queryone(
                 "INSERT INTO employees ( email ,username ,firstname ,lastname ,birthdate ,hashed_password, type, phonenumber)"
-                "VALUES (%s,%s,%s,%s,  to_date(%s, 'DD-MM-YYY'), %s,%s,%s) RETURNING id",
+                "VALUES (%s,%s,%s,%s, %s, %s,%s,%s) RETURNING id",
                 employee_to_add.getEmail(),
                 employee_to_add.getUsername(),
                 employee_to_add.getFirstname(),

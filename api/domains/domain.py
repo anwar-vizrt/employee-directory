@@ -1,4 +1,7 @@
+from util.PIIHandler import PIIHandler
 from util.constants import Roles
+
+
 class Employee:
     def __init__(self, json_data = None, raw_data = None):
         if json_data:
@@ -16,9 +19,7 @@ class Employee:
             self.__email = raw_data['email']
             self.__firstname = raw_data['firstname']
             self.__lastname = raw_data['lastname']
-            birthdate = raw_data['birthdate']
-            birthdate = birthdate.strftime('%d-%m-%Y')
-            self.__birthdate = birthdate
+            self.__birthdate = raw_data['birthdate']
             self.__phonenumber = raw_data['phonenumber']
             self.__type = raw_data['type']
 
@@ -49,6 +50,18 @@ class Employee:
 
     def set_hashed_password(self,hashed_password):
         self.__password = hashed_password
+
+    def encrypt(self, key):
+        self.__birthdate = PIIHandler.encrypt(key, self.__birthdate)
+        self.__phonenumber = PIIHandler.encrypt(key, self.__phonenumber)
+        self.__firstname = PIIHandler.encrypt(key, self.__firstname)
+        self.__lastname = PIIHandler.encrypt(key, self.__lastname)
+
+    def decrypt(self, key):
+        self.__birthdate = PIIHandler.decrypt(key, self.__birthdate)
+        self.__phonenumber = PIIHandler.decrypt(key, self.__phonenumber)
+        self.__firstname = PIIHandler.decrypt(key, self.__firstname)
+        self.__lastname = PIIHandler.decrypt(key, self.__lastname)
 
     def getUsername(self):
         return self.__username

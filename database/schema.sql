@@ -9,14 +9,14 @@
 DROP TABLE IF EXISTS employees;
 CREATE TABLE employees (
     id SERIAL PRIMARY KEY,
-    email VARCHAR(100) NOT NULL UNIQUE,
+    email VARCHAR(1024) NOT NULL UNIQUE,
     username VARCHAR(20) NOT NULL UNIQUE,
-    firstname VARCHAR (100) NOT NULL,
-    lastname VARCHAR(100) NOT NULL,
-    birthdate DATE NOT NULL,
-    hashed_password VARCHAR(100) NOT NULL,
+    firstname VARCHAR (1024) NOT NULL,
+    lastname VARCHAR(1024) NOT NULL,
+    birthdate VARCHAR(1024) NOT NULL,
+    hashed_password VARCHAR(1024) NOT NULL,
     type INT NOT NULL,
-    phonenumber VARCHAR(20) NOT NUll UNIQUE
+    phonenumber VARCHAR(1024) NOT NUll UNIQUE
 );
 
 

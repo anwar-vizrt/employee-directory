@@ -1,10 +1,10 @@
 {
-  "username": "manager",
-  "password": "mypass",
-  "firstname": "Sk Mohd Anwarul",
-  "lastname": "Islam",
-  "email": "sk.anwarul.islam@gmail.com",
+  "username": "another",
+  "password": "another",
+  "firstname": "foofoo",
+  "lastname": "blabla",
+  "email": "another@example.com",
   "phonenumber": "013930303",
-  "type": "manager",
-  "birthdate": "08-07-1987"
+  "type": "regular",
+  "birthdate": "08-07-1988"
 }
