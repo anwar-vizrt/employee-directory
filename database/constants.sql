@@ -25,4 +25,4 @@ INSERT INTO employees (
     hashed_password,
     type,
     phonenumber
-) VALUES ('manager@exmaple.com','manager','Cool','Manager',  to_date('08-07-1987', 'DD-MM-YYY'), '$2b$12$hg34JSZJGZxYHPORdmDxROiuzRAJzPsNGIDVWzm2d1FsPpguJQusa', 1, '0123454')
+) VALUES ('manager@exmaple.com','admin','qDXJ3ZYpRHRRZPSiI/tmYcDs609EVAOgyECA36gV7+I=','56nBwUl3Bc+qUrI7cxG2lAbcDULuJZt5VKzKnBZyb04=',  'a//bT5jvaNY+BU7vzp4V3noiJ9eQln7o1mpMheX1aZ0=' , '$2b$12$hg34JSZJGZxYHPORdmDxRO0YGHA.B25wSJbD3RYHQodm2ZWvpBJj2', 1, 'nC//uLPJRA1XIO8d449s9L9H23Alou/nO8w1cQoPo50=')
