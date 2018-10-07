@@ -1,8 +1,10 @@
-db:
-  image: postgres:10.3
-  environment:
-    POSTGRES_USER: directory
-    POSTGRES_PASSWORD: directory
-    POSTGRES_DB: symatec
-  ports:
-          - "5432:5432"
+version: '3.5'
+services:
+  db:
+    image: postgres:10.3
+    environment:
+      POSTGRES_USER: directory
+      POSTGRES_PASSWORD: directory
+      POSTGRES_DB: symatec
+    ports:
+            - "5432:5432"

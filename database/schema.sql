@@ -15,13 +15,8 @@ CREATE TABLE employees (
     lastname VARCHAR(100) NOT NULL,
     birthdate DATE NOT NULL,
     hashed_password VARCHAR(100) NOT NULL,
+    type INT NOT NULL,
     phonenumber VARCHAR(20) NOT NUll UNIQUE
-);
-
-DROP TABLE IF EXISTS roles;
-CREATE TABLE roles (
-     id SERIAL PRIMARY KEY,
-     roletype VARCHAR(100) NOT NULL UNIQUE
 );
 
 
