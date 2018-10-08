@@ -5,7 +5,7 @@ This project is a prototype to build a rest api for employee directory in a secu
 ## Clone
 This project can be cloned by running
 ```
-git clone
+git clone git@github.com:anwar-vizrt/employee-directory.git
 ```
 
 ## Run on docker container
