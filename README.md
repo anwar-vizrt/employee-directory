@@ -12,12 +12,12 @@ git clone git@github.com:anwar-vizrt/employee-directory.git
 
 This project can be run on docker containers easily. Here are the steps
 
-1. Install latest version of [docker][https://docs.docker.com/install/] and [docker-compose][https://docs.docker.com/compose/install/] on your machine.
+1. Install latest version of [docker](https://docs.docker.com/install/) and [docker-compose](https://docs.docker.com/compose/install/) on your machine.
 2. Now we need to build the project. To do that, change the directory to your project root directory and run
 ```
 docker-compose build
 ```
-3. Now we can run the project by
+3. Now we can start the containers by running
 
 ```
 docker-compose up
@@ -38,16 +38,16 @@ docker-compose restart
 
 The system is loaded with one manager user, there are only two types of user that can be created using
 the api  `manager|regular`. A new user/employee can only be created by a manager. A regular user can
-only be see his/her personal information. He/She can also update their personal information. A manager is
+only see his/her personal information. He/She can also update their personal information. A manager is
 allowed to create a new user, search a specific user with `username` or search all user.
 
 ### View employee
 
-A employee information can be access via following url
+A employee information can be access via following url pattern
 
 `http://<host>:<port>/employee/{id}`
 
-If we are running the api in docker container as described above. We can access the default manager
+If we are running the api locally in docker container as described above. We can access the default manager
 info by doing a simple curl get request like below
 ```
 curl -v -u admin:admin  http://localhost:8888/employee/1
@@ -55,7 +55,7 @@ curl -v -u admin:admin  http://localhost:8888/employee/1
 ```
 
 ### Update employee information
-If we want to update this default manager personal information by doing a put operation on the same url which is
+If we want to update this default manager personal information, we cam do this by http put request on the same url which is
 unique for this user. To update the employee information we have to get/generate the current user json data
 then update the fields that we are interested in then do a `PUT` request with the data to the same url.
 
@@ -111,11 +111,18 @@ A admin user can only search employees, it can be done by doing a get request ur
 curl -v -u admin:admin  http://localhost:8888/employee/search/
 ```
 this will show all the employee in the system
-Now if the manager want to search an specific employee he can do that by
+Now if the manager want to search an specific employee he can do that by the username
 
 ```
  curl -v -u admin:admin  http://localhost:8888/employee/search/?name=admin
 ```
 
-Important thing is here all the informations like password, birthdate, firstname, lastname will be decrypted in this list for the user.
+Important thing is here all the information like password, birthdate, firstname, lastname will be decrypted in this list for the user.
 So the manager can only see email address and username, while searching for users.
+
+## Limitations
+There are certain limitation of this implementation
+* The Manager will not be able to update any user information.
+* The encryption is done based on a key provided by employee. If it is lost then he can not login anymore
+* This uses basic Authentication may be using JWT or token based approach is more robust.
+* No ssl termination on top of API for now for secure communication.
