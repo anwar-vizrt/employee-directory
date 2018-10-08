@@ -13,11 +13,11 @@ from tornado.options import define, options
 from util.constants import Roles
 
 define("port", default=8888, help="run on the given port", type=int)
-define("db_host", default="127.0.0.1", help="blog database host")
-define("db_port", default=5432, help="blog database port")
-define("db_database", default="symatec", help="blog database name")
-define("db_user", default="directory", help="blog database user")
-define("db_password", default="directory", help="blog database password")
+define("db_host", default="db", help="db container")
+define("db_port", default=5432, help="db prot")
+define("db_database", default="directory", help="database name")
+define("db_user", default="admin", help="database user")
+define("db_password", default="Admin@123", help="database password")
 
 
 class NoResultError(Exception):
@@ -183,33 +183,34 @@ class EmployeeHandler(AuthenticationHandler):
                     print(self.request.body)
                     json_data = tornado.escape.json_decode(self.request.body)
                     updated_employee = Employee(json_data)
-                    updated_employee.encrypt(updated_employee.getPassword())
-                    updated_employee.set_hashed_password(
-                        await self.get_hashed_password(json_data['password'], user.hashed_password))
+                    if json_data['password'] != user.hashed_password:
+                        updated_employee.encrypt(updated_employee.getPassword())
+                        updated_employee.set_hashed_password(
+                            await self.get_hashed_password(json_data['password'], user.hashed_password))
+                    else:
+                        updated_employee.encrypt(self.getPasswordFromAuthHeader())
                     employee = Employee(None, user)
                     if employee.equals(updated_employee):
                         self.set_status(304)
                         return False
-                    if json_data:
-
-                        if employee.getUsername() != updated_employee.getUsername():
-                            print("Not allowed to change the username ", user.username)
-                            raise tornado.web.HTTPError(403)
-                        else:
-                            updateUser = await self.queryone(
-                                "UPDATE employees SET ( email ,username ,firstname ,lastname ,birthdate ,hashed_password, type, phonenumber) = "
-                                "(%s,%s,%s,%s, %s, %s, %s, %s) where id = %s RETURNING id",
-                                updated_employee.getEmail(),
-                                updated_employee.getUsername(),
-                                updated_employee.getFirstname(),
-                                updated_employee.getLastname(),
-                                updated_employee.getBirthdate(),
-                                updated_employee.getPassword(),
-                                updated_employee.getType(),
-                                updated_employee.getPhonenumber(),
-                                userid
-                            )
-                            print("Updated user id : ", updateUser.id)
+                    if employee.getUsername() != updated_employee.getUsername():
+                        print("Not allowed to change the username ", user.username)
+                        raise tornado.web.HTTPError(403)
+                    else:
+                        updateUser = await self.queryone(
+                            "UPDATE employees SET ( email ,username ,firstname ,lastname ,birthdate ,hashed_password, type, phonenumber) = "
+                            "(%s,%s,%s,%s, %s, %s, %s, %s) where id = %s RETURNING id",
+                            updated_employee.getEmail(),
+                            updated_employee.getUsername(),
+                            updated_employee.getFirstname(),
+                            updated_employee.getLastname(),
+                            updated_employee.getBirthdate(),
+                            updated_employee.getPassword(),
+                            updated_employee.getType(),
+                            updated_employee.getPhonenumber(),
+                            userid
+                        )
+                        print("Updated user id : ", updateUser.id)
             except NoResultError:
                 raise tornado.web.HTTPError(404)
         else:

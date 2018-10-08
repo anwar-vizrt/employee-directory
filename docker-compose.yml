@@ -3,8 +3,18 @@ services:
   db:
     image: postgres:10.3
     environment:
-      POSTGRES_USER: directory
-      POSTGRES_PASSWORD: directory
-      POSTGRES_DB: symatec
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: Admin@123
+      POSTGRES_DB: directory
     ports:
-            - "5432:5432"
+      - "5432:5432"
+
+  api:
+    build:
+      context: .
+    links:
+      - db
+    ports:
+      - "8888:8888"
+
+
